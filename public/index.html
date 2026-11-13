@@ -102,6 +102,7 @@ dt { color: var(--muted); } dd { margin: 0; text-align: right; font-variant-nume
   </aside>
 </main>
 
+<script src="/config.js"></script>
 <script>
 /* ---------------- constants and the HSB palette ---------------- */
 const W = 128, H = 128;
@@ -348,7 +349,9 @@ function applyDraw(c, px) {
 }
 
 function connect() {
-  ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host);
+  const serverUrl = new URL(window.PIXEL_BATTLE_SERVER_URL || location.origin);
+  serverUrl.protocol = serverUrl.protocol === 'https:' ? 'wss:' : 'ws:';
+  ws = new WebSocket(serverUrl.toString());
   ws.onopen = () => { $('conn').textContent = 'Connected'; ws.send(JSON.stringify({ t: 'hello', id: pid })); };
   ws.onmessage = ev => {
     const m = JSON.parse(ev.data);
@@ -375,7 +378,8 @@ function connect() {
 $('replay').onclick = async () => {
   if (replaying) return;
   let log;
-  try { log = await (await fetch('/log')).json(); } catch (_) { $('rstat').textContent = 'Could not load the action log.'; return; }
+  const serverOrigin = window.PIXEL_BATTLE_SERVER_URL || location.origin;
+  try { log = await (await fetch(new URL('/log', serverOrigin))).json(); } catch (_) { $('rstat').textContent = 'Could not load the action log.'; return; }
   if (!log.length) { $('rstat').textContent = 'No actions yet.'; return; }
   replaying = true; $('replay').disabled = true; clearPts();
   for (let i = 0; i < W * H; i++) setPixel(i % W, (i / W) | 0, 0);

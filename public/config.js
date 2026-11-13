@@ -1,0 +1,1 @@
+window.PIXEL_BATTLE_SERVER_URL = '';

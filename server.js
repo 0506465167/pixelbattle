@@ -57,7 +57,10 @@ const server = http.createServer((req, res) => {
       res.end(buf);
     });
   } else if (req.url === '/log') {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    });
     res.end(JSON.stringify(log));
   } else {
     res.writeHead(404); res.end('Not found');
